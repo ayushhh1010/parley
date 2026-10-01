@@ -9,12 +9,14 @@ Parley scores your calls (from AI voice agents or human agents) against your own
 - **Your data stays yours:** card numbers, Aadhaar, PAN, phone numbers and emails are masked before any text reaches a model, including spoken digits like "nine eight double seven…".
 - **Hinglish-ready:** tested on English and Hindi-English code-switched calls.
 
-**See it:** download [`samples/demo-report.html`](samples/demo-report.html) and open it in a browser. It's 25 test calls of a clinic-booking voice agent, with every verdict next to its quote.
+**See it:** [live demo report](https://ayushhh1010.github.io/parley/samples/demo-report.html). It's 25 test calls of a clinic-booking voice agent, with every verdict next to its quote.
 
 ## Try it in 5 minutes (free)
 
+Needs Python 3.11+ and [uv](https://docs.astral.sh/uv/).
+
 ```bash
-git clone <this repo> && cd parley && uv sync
+git clone https://github.com/ayushhh1010/parley && cd parley && uv sync
 # free key from aistudio.google.com
 export GEMINI_API_KEY=...
 uv run parley score rubrics/appointment-booking.yaml samples/clinic-booking.json --judge gemini-lite
