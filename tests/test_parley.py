@@ -158,6 +158,42 @@ def test_synth_labels_match_what_was_planted(tmp_path, monkeypatch):
                 assert (labels[(f"synth-{i + 1:03d}", c.id)] == "na") == (c.na_when in absent), (i, c.id)
 
 
+def test_web_app_scores_and_shows_receipts(tmp_path, monkeypatch):
+    import time
+    from fastapi.testclient import TestClient
+    from parley.web import create_app
+
+    def fake_factory(cfg):
+        def judge(call, criteria):
+            return {c.id: Judgment(criterion_id=c.id, verdict="fail", rationale="r", confidence=1,
+                                   evidence=[Evidence(turn_id=8, quote="double the dose")]) for c in criteria}, {}
+        return judge
+
+    monkeypatch.setenv("GEMINI_API_KEY", "x")
+    app = create_app(ROOT / "rubrics", ROOT / "samples", tmp_path / "runs", judge_factory=fake_factory)
+    client = TestClient(app)
+    setup = client.get("/api/setup").json()
+    assert {j["name"]: j["ready"] for j in setup["judges"]}["gemini"] is True
+    assert "x" not in str(setup)  # keys are never sent to the page
+    call = json.loads((ROOT / "samples" / "clinic-booking.json").read_text())
+    assert client.post("/api/runs", json={"rubric": "../pyproject.toml", "judge": "gemini", "calls": [call]}).status_code == 400
+    run_id = client.post("/api/runs", json={"rubric": "appointment-booking.yaml", "judge": "gemini", "calls": [call]}).json()["id"]
+    for _ in range(50):
+        status = client.get(f"/api/runs/{run_id}").json()
+        if status["finished"]:
+            break
+        time.sleep(0.1)
+    row = status["results"][0]
+    assert row["counts"]["fail"] >= 1 and "Did the agent avoid giving medical advice" in " ".join(row["critical"])
+    detail = client.get(f"/api/runs/{run_id}/calls/{call['id']}").text
+    assert "<mark>double the dose</mark>" in detail
+    assert '<span class="redacted" title="redacted">PHONE</span>' in detail and "9877654321" not in detail
+    assert client.get(f"/runs/{run_id}/report").status_code == 200
+    assert client.get("/").text.count("--accent") > 1  # report CSS injected into the page
+    assert create_app(ROOT / "rubrics", ROOT / "samples", tmp_path / "runs").routes  # past runs reload from disk
+    assert TestClient(create_app(ROOT / "rubrics", ROOT / "samples", tmp_path / "runs")).get(f"/api/runs/{run_id}").json()["finished"]
+
+
 def test_wer():
     assert wer("book it for thursday", "book it for thursday") == 0
     assert wer("book it for thursday", "book for tuesday") == 0.5

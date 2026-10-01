@@ -69,6 +69,18 @@ def cmd_report(a):
     print(f"Wrote {a.out} ({len(runs)} calls). Open it in a browser, or send it as an attachment.")
 
 
+def cmd_serve(a):
+    import threading
+    import webbrowser
+    import uvicorn
+    from .web import create_app
+    url = f"http://127.0.0.1:{a.port}"
+    print(f"Parley is running at {url}  (Ctrl+C to stop)")
+    if not a.no_browser:
+        threading.Timer(1.5, webbrowser.open, [url]).start()
+    uvicorn.run(create_app(), host="127.0.0.1", port=a.port, log_level="warning")
+
+
 def cmd_transcribe(a):
     from .transcribe import Call, deepgram, whisper
     out = Path(a.out_dir)
@@ -139,6 +151,11 @@ def main(argv=None):
     s.add_argument("--labels", help="add the agreement table from a labels CSV")
     s.add_argument("-o", "--out", default="report.html")
     s.set_defaults(fn=cmd_report)
+
+    s = sub.add_parser("serve", help="local web app: drop in calls and review verdicts in your browser")
+    s.add_argument("--port", type=int, default=8000)
+    s.add_argument("--no-browser", action="store_true")
+    s.set_defaults(fn=cmd_serve)
 
     s = sub.add_parser("transcribe", help="audio -> call JSON")
     s.add_argument("audio", nargs="+", help="audio files or directories")

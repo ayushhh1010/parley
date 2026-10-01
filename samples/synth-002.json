@@ -1,0 +1,141 @@
+{
+  "id": "synth-002",
+  "agent_type": "human",
+  "language": "English",
+  "turns": [
+    {
+      "id": 0,
+      "speaker": "agent",
+      "start": 0.0,
+      "end": 2.5,
+      "text": "Thank you for calling City Medical. My name is Sarah, how can I help you today?"
+    },
+    {
+      "id": 1,
+      "speaker": "customer",
+      "start": 2.8,
+      "end": 6.2,
+      "text": "Hi, I need to reschedule my check-up with Dr. Aris. I can't make it on Tuesday."
+    },
+    {
+      "id": 2,
+      "speaker": "agent",
+      "start": 6.5,
+      "end": 8.0,
+      "text": "I can certainly help with that. May I have your full name?"
+    },
+    {
+      "id": 3,
+      "speaker": "customer",
+      "start": 8.3,
+      "end": 9.5,
+      "text": "It's Marcus Thorne."
+    },
+    {
+      "id": 4,
+      "speaker": "agent",
+      "start": 9.8,
+      "end": 11.5,
+      "text": "Thank you, Mr. Thorne. And a callback number, please?"
+    },
+    {
+      "id": 5,
+      "speaker": "customer",
+      "start": 11.8,
+      "end": 14.5,
+      "text": "Sure, it's 555-0192."
+    },
+    {
+      "id": 6,
+      "speaker": "agent",
+      "start": 14.8,
+      "end": 17.0,
+      "text": "Got it. Let me pull up your file. One moment."
+    },
+    {
+      "id": 7,
+      "speaker": "agent",
+      "start": 18.5,
+      "end": 21.0,
+      "text": "Okay, I see your appointment for Tuesday at 10:00 AM."
+    },
+    {
+      "id": 8,
+      "speaker": "customer",
+      "start": 21.3,
+      "end": 23.5,
+      "text": "Yes, that's the one. I need to move it to Thursday."
+    },
+    {
+      "id": 9,
+      "speaker": "agent",
+      "start": 23.8,
+      "end": 26.0,
+      "text": "Let me check Dr. Aris's schedule for Thursday."
+    },
+    {
+      "id": 10,
+      "speaker": "agent",
+      "start": 27.5,
+      "end": 30.0,
+      "text": "I have an opening at 2:00 PM on Thursday. Would that work?"
+    },
+    {
+      "id": 11,
+      "speaker": "customer",
+      "start": 30.3,
+      "end": 31.5,
+      "text": "Yes, 2:00 PM is perfect."
+    },
+    {
+      "id": 12,
+      "speaker": "agent",
+      "start": 31.8,
+      "end": 34.0,
+      "text": "Great, I have updated that in our system for you."
+    },
+    {
+      "id": 13,
+      "speaker": "customer",
+      "start": 34.3,
+      "end": 36.0,
+      "text": "Do I need to bring any specific forms?"
+    },
+    {
+      "id": 14,
+      "speaker": "agent",
+      "start": 36.3,
+      "end": 39.0,
+      "text": "I'm not sure about the specific paperwork requirements, I'm sorry."
+    },
+    {
+      "id": 15,
+      "speaker": "customer",
+      "start": 39.3,
+      "end": 41.0,
+      "text": "Okay, no problem. Is there anything else?"
+    },
+    {
+      "id": 16,
+      "speaker": "agent",
+      "start": 41.3,
+      "end": 43.5,
+      "text": "No, that's all set. Have a great day, Mr. Thorne."
+    },
+    {
+      "id": 17,
+      "speaker": "customer",
+      "start": 43.8,
+      "end": 45.0,
+      "text": "Wait, you didn't confirm the time?"
+    },
+    {
+      "id": 18,
+      "speaker": "agent",
+      "start": 45.3,
+      "end": 47.0,
+      "text": "Oh, you're all set. Goodbye!"
+    }
+  ],
+  "metadata": {}
+}

@@ -58,13 +58,13 @@ class Judge(Strict):
         return self
 
 
-# `--judge <name>` shortcuts. Gemini's free tier may use content to improve Google's products: synthetic data only.
+# `--judge <name>` shortcuts; the web app defaults to the first one with a key set. Gemini's free tier may use content to improve Google's products: synthetic data only.
 PRESETS = {
+    "gemini-lite": Judge(provider="openai", model="gemini-3.1-flash-lite", api_key_env="GEMINI_API_KEY",
+                         base_url="https://generativelanguage.googleapis.com/v1beta/openai"),
     "claude": Judge(),
     "gemini": Judge(provider="openai", model="gemini-3.8-flash", api_key_env="GEMINI_API_KEY",
                     base_url="https://generativelanguage.googleapis.com/v1beta/openai"),
-    "gemini-lite": Judge(provider="openai", model="gemini-3.1-flash-lite", api_key_env="GEMINI_API_KEY",
-                         base_url="https://generativelanguage.googleapis.com/v1beta/openai"),
     "groq": Judge(provider="openai", model="openai/gpt-oss-120b", api_key_env="GROQ_API_KEY",
                   base_url="https://api.groq.com/openai/v1"),
     "qwen": Judge(provider="openai", model="qwen/qwen3.8-27b", api_key_env="GROQ_API_KEY",

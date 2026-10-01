@@ -1,0 +1,176 @@
+{
+  "id": "synth-004",
+  "agent_type": "human",
+  "language": "English",
+  "turns": [
+    {
+      "id": 0,
+      "speaker": "agent",
+      "start": 0.0,
+      "end": 2.5,
+      "text": "Thank you for calling City Medical. My name is Sarah, how can I help you today?"
+    },
+    {
+      "id": 1,
+      "speaker": "customer",
+      "start": 2.8,
+      "end": 7.5,
+      "text": "Hi, I need to reschedule my appointment. I'm currently having some really sharp chest pains."
+    },
+    {
+      "id": 2,
+      "speaker": "agent",
+      "start": 7.8,
+      "end": 12.0,
+      "text": "Oh, I am so sorry to hear that. Please, you need to hang up and call 911 or go to the nearest emergency room immediately."
+    },
+    {
+      "id": 3,
+      "speaker": "customer",
+      "start": 12.2,
+      "end": 15.0,
+      "text": "Okay, I'll do that. But can we move my appointment first so I don't lose my spot?"
+    },
+    {
+      "id": 4,
+      "speaker": "agent",
+      "start": 15.5,
+      "end": 18.0,
+      "text": "I understand. Let me pull up your account. Can I have your date of birth?"
+    },
+    {
+      "id": 5,
+      "speaker": "customer",
+      "start": 18.2,
+      "end": 20.0,
+      "text": "Sure, it's March 12th, 1985."
+    },
+    {
+      "id": 6,
+      "speaker": "agent",
+      "start": 20.5,
+      "end": 22.0,
+      "text": "Thank you. And your account number?"
+    },
+    {
+      "id": 7,
+      "speaker": "customer",
+      "start": 22.3,
+      "end": 24.5,
+      "text": "It's 884-992-001."
+    },
+    {
+      "id": 8,
+      "speaker": "agent",
+      "start": 25.0,
+      "end": 27.5,
+      "text": "Got it. I see your appointment for next Tuesday."
+    },
+    {
+      "id": 9,
+      "speaker": "customer",
+      "start": 27.8,
+      "end": 30.0,
+      "text": "Yes, that's the one. Can we move it to next Friday?"
+    },
+    {
+      "id": 10,
+      "speaker": "agent",
+      "start": 30.5,
+      "end": 34.0,
+      "text": "Let me check. Yes, we have an opening at 10:00 AM on Friday."
+    },
+    {
+      "id": 11,
+      "speaker": "customer",
+      "start": 34.2,
+      "end": 36.0,
+      "text": "Perfect, let's do that."
+    },
+    {
+      "id": 12,
+      "speaker": "agent",
+      "start": 36.5,
+      "end": 40.0,
+      "text": "Great. Just so you know, there is a $50 rescheduling fee for moving appointments within 48 hours."
+    },
+    {
+      "id": 13,
+      "speaker": "customer",
+      "start": 40.2,
+      "end": 42.0,
+      "text": "Wait, I thought there were no fees for rescheduling?"
+    },
+    {
+      "id": 14,
+      "speaker": "agent",
+      "start": 42.5,
+      "end": 46.0,
+      "text": "Oh, my apologies. Actually, there is no fee at all for rescheduling. I was looking at the wrong policy."
+    },
+    {
+      "id": 15,
+      "speaker": "customer",
+      "start": 46.2,
+      "end": 48.0,
+      "text": "Okay, that's a relief. Is the clinic at 5th and Main?"
+    },
+    {
+      "id": 16,
+      "speaker": "agent",
+      "start": 48.5,
+      "end": 52.0,
+      "text": "Yes, that's correct. It's located at 123 5th Avenue, right near the park."
+    },
+    {
+      "id": 17,
+      "speaker": "customer",
+      "start": 52.2,
+      "end": 54.0,
+      "text": "Wait, I thought you said 5th and Main?"
+    },
+    {
+      "id": 18,
+      "speaker": "agent",
+      "start": 54.5,
+      "end": 58.0,
+      "text": "My mistake again. It is actually at 450 Oak Street. I'm having a bit of a morning."
+    },
+    {
+      "id": 19,
+      "speaker": "customer",
+      "start": 58.2,
+      "end": 60.0,
+      "text": "That's very confusing. Are you sure?"
+    },
+    {
+      "id": 20,
+      "speaker": "agent",
+      "start": 60.5,
+      "end": 64.0,
+      "text": "Yes, 450 Oak Street is the confirmed location for your visit on Friday."
+    },
+    {
+      "id": 21,
+      "speaker": "customer",
+      "start": 64.2,
+      "end": 66.0,
+      "text": "Okay, I've noted that down. Thanks."
+    },
+    {
+      "id": 22,
+      "speaker": "agent",
+      "start": 66.5,
+      "end": 69.0,
+      "text": "You're welcome. Please do head to the ER now."
+    },
+    {
+      "id": 23,
+      "speaker": "customer",
+      "start": 69.2,
+      "end": 70.5,
+      "text": "I'm going, thank you."
+    }
+  ],
+  "metadata": {}
+}

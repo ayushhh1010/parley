@@ -2,6 +2,7 @@
 import json
 import os
 import sys
+import threading
 import time
 from typing import Literal
 
@@ -49,6 +50,14 @@ class JudgeError(Exception):
     """A failure that should become "cannot determine" rather than stop the run."""
 
 
+_hook = threading.local()
+
+
+def notify(message: str):
+    """Progress message: printed in the CLI, shown on the page by `parley serve` (set per scoring thread)."""
+    getattr(_hook, "fn", lambda m: print(f"  {m}", file=sys.stderr))(message)
+
+
 def build_prompt(call: Call, criteria: list[Criterion]) -> str:
     def describe(c):
         lines = [f"id: {c.id}", f"question: {c.question}"]
@@ -88,15 +97,18 @@ def openai_parse(cfg: Judge, system: str, prompt: str, schema: type[BaseModel]):
                           + json.dumps(schema.model_json_schema())},
                          {"role": "user", "content": prompt}]}
     try:
-        for attempt in range(6):  # free tiers rate-limit (429) and shed load (503) often
+        for attempt in range(6):
             r = httpx.post(f"{cfg.base_url.rstrip('/')}/chat/completions", json=body, headers=headers, timeout=300)
-            if r.status_code not in (429, 500, 502, 503, 504) or attempt == 5:
+            # Rate limits (429) clear by waiting; an overloaded model (5xx) rarely does, so give up on it sooner.
+            retryable = r.status_code == 429 or r.status_code >= 500
+            if not retryable or attempt == (5 if r.status_code == 429 else 2):
                 break
             wait = min(60.0, float(r.headers.get("retry-after", 5 * 2 ** attempt)))
-            print(f"  {cfg.model}: HTTP {r.status_code}, retrying in {wait:.0f}s ({attempt + 1}/5)", file=sys.stderr)
+            busy = "rate limit reached" if r.status_code == 429 else "model overloaded"
+            notify(f"{cfg.model}: {busy} (HTTP {r.status_code}), retrying in {wait:.0f}s")
             time.sleep(wait)
-        if r.status_code in (429, 500, 502, 503, 504):
-            raise JudgeError(f"HTTP {r.status_code} after retries: {r.text[:200]}")
+        if retryable:
+            raise JudgeError(f"{cfg.model} still unavailable (HTTP {r.status_code}); try another judge")
         r.raise_for_status()
         data = r.json()
         text = data["choices"][0]["message"]["content"].strip().removeprefix("```json").removesuffix("```")

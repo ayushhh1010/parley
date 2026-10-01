@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Parley</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/*REPORT_CSS*/
+.top{display:flex;align-items:baseline;gap:12px;padding:12px max(16px,calc((100% - 1200px)/2 + 16px));border-bottom:1px solid var(--line);background:var(--panel)}
+.brand{font-weight:600;font-size:16px;color:var(--text);text-decoration:none}
+.form{padding:16px;display:grid;gap:6px;max-width:640px}
+.form label{font-weight:500;margin-top:10px}
+select,button{font:inherit;color:inherit}
+select{padding:7px 8px;border:1px solid var(--line);border-radius:6px;background:var(--panel)}
+.drop{border:1px dashed var(--muted);border-radius:8px;padding:24px 16px;text-align:center;color:var(--muted);cursor:pointer}
+.drop.over,.drop:focus-visible{border-color:var(--accent);color:var(--accent);outline:none}
+.primary{margin-top:14px;justify-self:start;padding:8px 16px;border:0;border-radius:6px;background:var(--accent);color:#fff;font-weight:500;cursor:pointer}
+.primary:disabled{opacity:.5;cursor:default}
+.link{justify-self:start;background:none;border:0;padding:0;color:var(--accent);cursor:pointer;text-decoration:underline}
+.error{color:var(--fail);margin:4px 0 0;white-space:pre-wrap}
+.progress{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:8px 0 16px}
+.progress div{height:100%;width:0;background:var(--accent);transition:width .18s ease-out}
+tr.sel td{background:var(--target)}
+td a{color:var(--accent);font-weight:500;display:inline-block;padding:4px 0;white-space:nowrap}
+.turn.hit{background:var(--target)}
+.recent a{display:block;padding:10px 16px;border-bottom:1px solid var(--line);color:var(--text);text-decoration:none}
+.recent a:last-child{border-bottom:0}.recent a:hover{background:var(--target)}
+.back{display:inline-block;margin-bottom:12px;color:var(--accent)}
+#detail{margin-top:16px}
+#files:empty,#err:empty,#rubric-desc:empty,#status:empty{display:none}
+.files{display:flex;gap:12px;align-items:baseline}
+</style>
+</head>
+<body>
+<header class="top"><a class="brand" href="#">Parley</a><span class="muted">Every score has a receipt</span></header>
+<main>
+<section id="new">
+  <h1>Score calls</h1>
+  <p class="muted">Drop call files, pick a checklist and an AI judge. Personal data is masked before any model sees the text.</p>
+  <div class="panel form">
+    <label id="calls-label">Calls</label>
+    <div id="drop" class="drop" tabindex="0" role="button" aria-labelledby="calls-label">Drop call files (.json) here, or click to choose</div>
+    <input type="file" id="file" accept=".json,application/json" multiple hidden>
+    <div class="files"><p id="files" class="muted"></p><button id="clear" class="link" type="button" hidden>Clear</button></div>
+    <button id="samples" class="link" type="button"></button>
+    <label for="rubric">Checklist</label>
+    <select id="rubric"></select>
+    <p id="rubric-desc" class="muted"></p>
+    <label for="judge">AI judge</label>
+    <select id="judge"></select>
+    <p class="muted">Free tiers (Gemini, Groq) may use what you send to improve their models. Use them for test calls only.</p>
+    <button id="go" class="primary" type="button">Score calls</button>
+    <p id="err" class="error" role="alert"></p>
+  </div>
+  <h2>Recent runs</h2>
+  <div id="recent" class="panel recent"><p class="muted" style="padding:12px 16px;margin:0">No runs yet.</p></div>
+</section>
+
+<section id="run" hidden>
+  <a class="back" href="#">← New run</a>
+  <h1 id="run-title"></h1>
+  <p id="run-sub" class="sub"></p>
+  <div class="progress" role="progressbar" aria-label="Scoring progress"><div id="bar"></div></div>
+  <p id="status" class="muted" aria-live="polite"></p>
+  <div class="panel scroll-x"><table>
+    <thead><tr><th>Call</th><th>Agent</th><th>Verdicts</th><th>Critical fails</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table></div>
+  <div id="detail"></div>
+</section>
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+const el = (tag, cls, ...kids) => { const e = document.createElement(tag); if (cls) e.className = cls; e.append(...kids); return e; };
+const WORD = {fail: ["✕", "fail"], cannot_determine: ["?", "can't tell"], pass: ["✓", "pass"], na: ["–", "n/a"]};
+let dropped = [], useSamples = false, current = null, timer = null, sampleCount = 0;
+
+async function api(path, opts) {
+  const r = await fetch(path, opts);
+  if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || `HTTP ${r.status}`);
+  return r.headers.get("content-type").includes("json") ? r.json() : r.text();
+}
+
+async function init() {
+  const setup = await api("/api/setup");
+  for (const r of setup.rubrics) {
+    const o = new Option(r.error ? `${r.file} (invalid)` : `${r.name} v${r.version} · ${r.criteria} criteria`, r.file);
+    o.disabled = !!r.error; o.dataset.desc = r.error || r.description || "";
+    $("#rubric").add(o);
+  }
+  for (const j of setup.judges) {
+    const o = new Option(`${j.name} · ${j.model}${j.ready ? "" : " (API key not set)"}`, j.name);
+    o.disabled = !j.ready; $("#judge").add(o);
+  }
+  const firstReady = [...$("#judge").options].find(o => !o.disabled);
+  if (firstReady) firstReady.selected = true;
+  sampleCount = setup.samples;
+  showFiles();
+  $("#rubric").onchange = () => $("#rubric-desc").textContent = $("#rubric").selectedOptions[0]?.dataset.desc || "";
+  $("#rubric").onchange();
+  loadRecent();
+}
+
+function showFiles() {
+  const names = dropped.map(c => c.id || "unnamed");
+  $("#files").textContent = dropped.length ? `${dropped.length} call${dropped.length > 1 ? "s" : ""} ready: ${names.slice(0, 4).join(", ")}${names.length > 4 ? ", …" : ""}`
+    : useSamples ? `Using the ${sampleCount} sample calls.` : "";
+  $("#clear").hidden = !dropped.length;
+  $("#samples").textContent = useSamples ? "Don't use the sample calls" : `Or try the ${sampleCount} sample calls`;
+  $("#samples").hidden = !sampleCount || dropped.length > 0;
+}
+
+async function addFiles(files) {
+  const errors = [];
+  for (const f of files) {
+    try { const data = JSON.parse(await f.text()); dropped.push(...(Array.isArray(data) ? data : [data])); }
+    catch { errors.push(`${f.name}: not valid JSON`); }
+  }
+  useSamples = false; showFiles();
+  $("#err").textContent = errors.join("\n");
+}
+
+const drop = $("#drop");
+drop.onclick = () => $("#file").click();
+drop.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("#file").click(); } };
+drop.ondragover = e => { e.preventDefault(); drop.classList.add("over"); };
+drop.ondragleave = () => drop.classList.remove("over");
+drop.ondrop = e => { e.preventDefault(); drop.classList.remove("over"); addFiles(e.dataTransfer.files); };
+$("#file").onchange = e => addFiles(e.target.files);
+$("#samples").onclick = () => { useSamples = !useSamples; showFiles(); };
+$("#clear").onclick = () => { dropped = []; $("#file").value = ""; $("#err").textContent = ""; showFiles(); };
+
+$("#go").onclick = async () => {
+  $("#err").textContent = ""; $("#go").disabled = true;
+  try {
+    const {id} = await api("/api/runs", {method: "POST", headers: {"content-type": "application/json"},
+      body: JSON.stringify({rubric: $("#rubric").value, judge: $("#judge").value, calls: dropped, use_samples: useSamples && !dropped.length})});
+    dropped = []; useSamples = false; showFiles();
+    location.hash = `#run/${id}`;
+  } catch (e) { $("#err").textContent = e.message; }
+  finally { $("#go").disabled = false; }
+};
+
+async function loadRecent() {
+  const runs = await api("/api/runs");
+  if (!runs.length) return;
+  $("#recent").replaceChildren(...runs.map(r => {
+    const a = el("a", "", el("strong", "", `${r.rubric} v${r.rubric_version}`),
+      el("span", "muted", ` · ${r.judge} · ${r.done} of ${r.total} calls${r.stopped ? " (stopped)" : ""} · ${r.created.replace("T", " ")}`));
+    a.href = `#run/${r.id}`; return a;
+  }));
+}
+
+function counts(c) {
+  return el("span", "counts", ...Object.entries(WORD).filter(([v]) => c[v]).map(([v, [icon, word]]) =>
+    el("span", `verdict ${v}`, `${icon} ${c[v]} ${word}`)));
+}
+
+async function refresh(runId) {
+  const run = await api(`/api/runs/${runId}`);
+  if (current !== runId) return;
+  const m = run.meta, done = run.results.length;
+  $("#run-title").textContent = `${m.rubric} v${m.rubric_version}`;
+  $("#run-sub").replaceChildren(`${done} of ${m.total} calls scored · judge ${m.judge} (${m.model}) · ${m.created.replace("T", " ")}`,
+    ...(run.finished && done ? [" · ", Object.assign(el("a", "", "Open full report"), {href: `/runs/${runId}/report`, target: "_blank"})] : []));
+  $("#bar").style.width = `${100 * done / m.total}%`;
+  $("#status").textContent = run.finished ? "" : run.status || "Starting…";
+  $(".progress").setAttribute("aria-valuenow", Math.round(100 * done / m.total));
+  const selected = location.hash.split("/")[2];
+  $("#rows").replaceChildren(...run.results.map(s => {
+    if (s.error) {
+      const td = el("td", "error", s.error); td.colSpan = 3;
+      return el("tr", "", el("td", "mono", s.call_id), td);
+    }
+    const a = el("a", "mono", s.call_id); a.href = `#run/${runId}/${encodeURIComponent(s.call_id)}`;
+    const tr = el("tr", decodeURIComponent(selected || "") === s.call_id ? "sel" : "",
+      el("td", "", a), el("td", "muted", `${s.agent_type}${s.language ? " · " + s.language.split(" ")[0] : ""}`),
+      el("td", "", counts(s.counts)), el("td", "", s.critical.join("; ") || "–"));
+    return tr;
+  }));
+  if (!run.finished) timer = setTimeout(() => refresh(runId), 1500);
+}
+
+async function showCall(runId, callId) {
+  try { $("#detail").innerHTML = await api(`/api/runs/${runId}/calls/${encodeURIComponent(callId)}`); }
+  catch (e) { $("#detail").replaceChildren(el("p", "error", e.message)); return; }
+  $("#detail").scrollIntoView({behavior: "smooth", block: "start"});
+}
+
+// Evidence chips jump inside the transcript without changing the page address.
+$("#detail").onclick = e => {
+  const a = e.target.closest("a.chip"); if (!a) return;
+  e.preventDefault();
+  const turn = document.getElementById(a.getAttribute("href").slice(1));
+  document.querySelectorAll(".turn.hit").forEach(t => t.classList.remove("hit"));
+  turn?.classList.add("hit"); turn?.scrollIntoView({behavior: "smooth", block: "center"});
+};
+
+function route() {
+  const [, runId, callId] = location.hash.match(/^#run\/([a-z0-9]+)(?:\/(.+))?$/) || [];
+  $("#new").hidden = !!runId; $("#run").hidden = !runId;
+  if (!runId) { current = null; clearTimeout(timer); loadRecent(); return; }
+  if (current !== runId) { current = runId; $("#detail").replaceChildren(); }
+  clearTimeout(timer); refresh(runId);
+  if (callId) showCall(runId, decodeURIComponent(callId));
+}
+window.onhashchange = route;
+init().then(route).catch(e => $("#err").textContent = `Could not reach the Parley server: ${e.message}`);
+</script>
+</body>
+</html>

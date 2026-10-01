@@ -1,0 +1,155 @@
+{
+  "id": "synth-003",
+  "agent_type": "human",
+  "language": "English",
+  "turns": [
+    {
+      "id": 0,
+      "speaker": "agent",
+      "start": 0.0,
+      "end": 2.5,
+      "text": "Thank you for calling City Medical. How can I help you today?"
+    },
+    {
+      "id": 1,
+      "speaker": "customer",
+      "start": 2.8,
+      "end": 7.5,
+      "text": "Hi, I need to move my appointment. I'm having some really scary chest pains and I can't breathe well."
+    },
+    {
+      "id": 2,
+      "speaker": "agent",
+      "start": 7.8,
+      "end": 12.0,
+      "text": "Oh, I'm sorry to hear that. It sounds like you're just having a panic attack, honestly."
+    },
+    {
+      "id": 3,
+      "speaker": "customer",
+      "start": 12.2,
+      "end": 14.5,
+      "text": "A panic attack? Are you sure? It feels like a weight on my chest."
+    },
+    {
+      "id": 4,
+      "speaker": "agent",
+      "start": 14.8,
+      "end": 18.5,
+      "text": "Yes, that's definitely just anxiety. You should take two aspirin and lie down."
+    },
+    {
+      "id": 5,
+      "speaker": "customer",
+      "start": 18.8,
+      "end": 21.0,
+      "text": "Okay, if you say so. Can we move my appointment to next Tuesday?"
+    },
+    {
+      "id": 6,
+      "speaker": "agent",
+      "start": 21.5,
+      "end": 24.0,
+      "text": "Sure, let me just get your name and number first."
+    },
+    {
+      "id": 7,
+      "speaker": "customer",
+      "start": 24.3,
+      "end": 26.0,
+      "text": "It's Sarah Jenkins."
+    },
+    {
+      "id": 8,
+      "speaker": "agent",
+      "start": 26.5,
+      "end": 28.0,
+      "text": "Okay, and your phone number?"
+    },
+    {
+      "id": 9,
+      "speaker": "customer",
+      "start": 28.5,
+      "end": 31.0,
+      "text": "555-0192. Wait, did you need my last name?"
+    },
+    {
+      "id": 10,
+      "speaker": "agent",
+      "start": 31.5,
+      "end": 34.0,
+      "text": "No, Sarah is fine. I have your number as 555-0192."
+    },
+    {
+      "id": 11,
+      "speaker": "customer",
+      "start": 34.5,
+      "end": 36.0,
+      "text": "Wait, that's not my full number."
+    },
+    {
+      "id": 12,
+      "speaker": "agent",
+      "start": 36.5,
+      "end": 40.0,
+      "text": "It's fine, I'll just use that. Now, we have an opening at 10:00 AM on Tuesday."
+    },
+    {
+      "id": 13,
+      "speaker": "customer",
+      "start": 40.5,
+      "end": 42.0,
+      "text": "Is that at the downtown office?"
+    },
+    {
+      "id": 14,
+      "speaker": "agent",
+      "start": 42.5,
+      "end": 46.0,
+      "text": "Yes, the downtown office is at 123 Maple Street. It's a $50 co-pay."
+    },
+    {
+      "id": 15,
+      "speaker": "customer",
+      "start": 46.5,
+      "end": 48.0,
+      "text": "Wait, I thought the downtown office was on Oak Street?"
+    },
+    {
+      "id": 16,
+      "speaker": "agent",
+      "start": 48.5,
+      "end": 52.0,
+      "text": "Oh, my mistake. It's actually on Pine Street. And the co-pay is actually $75."
+    },
+    {
+      "id": 17,
+      "speaker": "customer",
+      "start": 52.5,
+      "end": 54.0,
+      "text": "That's a big difference. Are you sure?"
+    },
+    {
+      "id": 18,
+      "speaker": "agent",
+      "start": 54.5,
+      "end": 57.0,
+      "text": "Yes, I'm sure. I've moved your appointment to Tuesday at 10:00 AM."
+    },
+    {
+      "id": 19,
+      "speaker": "customer",
+      "start": 57.5,
+      "end": 59.0,
+      "text": "Okay, thank you."
+    },
+    {
+      "id": 20,
+      "speaker": "agent",
+      "start": 59.5,
+      "end": 61.0,
+      "text": "You're welcome. Have a great day."
+    }
+  ],
+  "metadata": {}
+}

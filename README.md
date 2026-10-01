@@ -25,6 +25,8 @@ uv run parley report scores.jsonl
 
 Open `report.html`. To score your own calls, convert them to the [call format](#call-format) or transcribe recordings with `parley transcribe`.
 
+**Prefer clicking?** `uv run parley serve` opens a local web app: drop in call files (or use the sample calls), pick a checklist and an AI judge, and review each call with its verdicts and quotes. It runs on your machine only, with no sign-in.
+
 ## Setup
 
 ```bash
