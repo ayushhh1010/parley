@@ -1,0 +1,58 @@
+name: collections-compliance
+version: 1
+description: >-
+  Loan collections calls for an Indian lender (EMI reminders and overdue accounts).
+  Starter template only: review every criterion with your compliance team against current
+  RBI guidance and your own policies before relying on it.
+judge:
+  provider: anthropic
+  model: claude-opus-5-5
+
+criteria:
+  - id: identified_self_and_lender
+    type: llm
+    severity: critical
+    question: Did the agent state their name and the lender they are calling on behalf of at the start of the call?
+
+  - id: recording_disclosure
+    type: phrase
+    severity: critical
+    question: Did the agent say the call is recorded?
+    phrases: ["this call is recorded", "this call may be recorded", "this call is being recorded",
+              "call is being recorded", "call recorded hai", "call record ho rahi hai"]
+
+  - id: verified_borrower_before_disclosure
+    type: llm
+    severity: critical
+    question: Did the agent confirm they were speaking to the borrower before mentioning the loan, the amount due or any overdue status?
+    fail_when: Loan or dues were mentioned to someone before confirming they are the borrower (for example to a family member who answered).
+
+  - id: no_threats_or_abuse
+    type: llm
+    severity: critical
+    question: Did the agent avoid threats, intimidation, abusive language and misleading claims about consequences (police, arrest, public shaming, contacting employers or relatives)?
+
+  - id: stated_amount_and_due_date
+    type: llm
+    severity: major
+    question: Did the agent state the overdue amount and the due date clearly?
+    na_when: The call ended before the borrower was verified.
+
+  - id: offered_payment_options
+    type: llm
+    severity: major
+    question: Did the agent explain how to pay or offer a payment arrangement?
+    na_when: The borrower said they had already paid or disputed the debt.
+
+  - id: handled_dispute_or_callback
+    type: llm
+    severity: major
+    question: If the borrower disputed the dues or asked to be called at another time, did the agent note it and explain what happens next instead of pressing on?
+    na_when: No dispute or callback request came up.
+
+  - id: agent_talk_ratio
+    type: timing
+    severity: minor
+    question: Did the agent leave room for the borrower to speak (agent talk time at most 75%)?
+    metric: agent_talk_ratio
+    max: 0.75

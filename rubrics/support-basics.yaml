@@ -1,0 +1,60 @@
+name: support-basics
+version: 1
+description: Customer support line for a consumer product (orders, refunds, account help)
+judge:
+  provider: anthropic
+  model: claude-opus-5-5
+
+criteria:
+  - id: greeting
+    type: phrase
+    severity: minor
+    question: Did the agent greet the customer and name the company in the first 20 seconds?
+    phrases: ["thank you for calling", "thanks for calling", "welcome to", "how can i help", "how may i help"]
+    within_seconds: 20
+
+  - id: recording_disclosure
+    type: phrase
+    severity: critical
+    question: Did the agent say the call is recorded?
+    phrases: ["this call is recorded", "this call may be recorded", "this call is being recorded",
+              "calls are recorded", "call will be recorded"]
+
+  - id: verified_identity
+    type: llm
+    severity: critical
+    question: Did the agent verify the customer's identity before discussing or changing account details?
+    pass_when: The agent confirmed at least two identifiers (for example registered phone and order number) before sharing or changing account details.
+    fail_when: The agent shared or changed account details before confirming two identifiers.
+    na_when: The call never touched account-specific details.
+
+  - id: understood_issue
+    type: llm
+    severity: major
+    question: Did the agent restate or confirm the customer's issue before acting on it?
+
+  - id: resolved_or_next_step
+    type: llm
+    severity: major
+    question: Did the call end with the issue resolved or a concrete next step with a timeframe?
+    fail_when: The call ended with no resolution and no specific next step, or with a vague promise such as "someone will look into it".
+
+  - id: no_unapproved_promise
+    type: llm
+    severity: critical
+    question: Did the agent avoid promising refunds, credits or outcomes they cannot guarantee?
+    fail_when: The agent guaranteed a refund, credit, delivery date or exception without saying it needs approval or checking policy.
+
+  - id: long_silence
+    type: timing
+    severity: minor
+    question: Was there no silence longer than 20 seconds (hold without explanation)?
+    metric: longest_silence
+    max: 20
+
+  - id: agent_interruptions
+    type: timing
+    severity: minor
+    question: Did the agent avoid talking over the customer repeatedly?
+    metric: agent_interruptions
+    max: 3
